@@ -1,14 +1,24 @@
 <!DOCTYPE html><html lang="en"><head><base href="/69b065057b54ee5b8e155b7b-preview/"><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="description" content=""><title>Akemi Detox Tea</title><link rel="icon" href="https://stdigitalmvmtprod001.blob.core.windows.net/assets/develop/adt-favicon-1%20(21).svg" type="image/svg+xml"><script>
 sessionStorage.setItem("test", false);
 
+const ALLOWED_AFFILIATE_IDS = [];
+
 let nextPageSlug = null;
 
 function handleUrlParams(params) {
   const specialParams = ["p_dc", "p_tenbucksoff", "p_freeship", "p_freegift"];
   const allowedDcValues = ["5", "10", "15", "20", "25"];
+  const currentAffId = params.get("affid") || sessionStorage.getItem("affid");
+  const discountsAllowed =
+    ALLOWED_AFFILIATE_IDS.length === 0 ||
+    (currentAffId !== null && ALLOWED_AFFILIATE_IDS.includes(currentAffId));
+  if (!discountsAllowed) {
+    specialParams.forEach((key) => sessionStorage.removeItem(key));
+  }
   params.forEach((value, key) => {
     const paramKey = `p_${key}`;
-    if (!sessionStorage.getItem(paramKey) && specialParams.includes(paramKey)) {
+    if (specialParams.includes(paramKey)) {
+      if (!discountsAllowed) return;
       if (paramKey === "p_dc" && !allowedDcValues.includes(value)) return;
       sessionStorage.setItem(paramKey, value);
     } else {
@@ -43,7 +53,6 @@ if (localStorage.getItem('sK_r')) {
       ? baseNext + '?' + urlParams.toString()
       : baseNext;
     nextPageSlug = withQuery && !withQuery.startsWith('/') ? '/69b065057b54ee5b8e155b7b-preview/' + withQuery : withQuery;
-    handleUrlParams(urlParams);
 
     document.addEventListener("DOMContentLoaded", () => {
       MVMT.init('69b065057b54ee5b8e155b7b', 'Home')
@@ -68,7 +77,7 @@ if (localStorage.getItem('sK_r')) {
 const route = async () => {
   if (localStorage.getItem('sK_r')) return JSON.parse(localStorage.getItem('sK_r'));
   const sessionId = MVMT.getSessionId() || localStorage.getItem("mvmt_session_id") || "";
-  const url = 'https://func-ab-test-events-prod-001.azurewebsites.net/api/checkRoute?id=69b065057b54ee5b8e155b7b&v=177635339872316&sessionId='+sessionId;
+  const url = 'https://func-ab-test-events-prod-001.azurewebsites.net/api/checkRoute?id=69b065057b54ee5b8e155b7b&v=177730244719275&sessionId='+sessionId;
   try {
     const response = await fetch(url);
     if (!response.ok) throw new Error('Network response was not ok');
@@ -120,9 +129,7 @@ const nextPage = async () => {
   return absolute;
 }
 const urlParams = new URLSearchParams(window.location.search);
-urlParams.forEach((value, key) => {
-  sessionStorage.setItem(key, value);
-});
+handleUrlParams(urlParams);
 
 document.addEventListener("DOMContentLoaded", () => {
   document.addEventListener("click", (event) => {
@@ -1473,7 +1480,8 @@ $(document).ready(function () {
 {
   "campaignId": "270",
   "pageType": "Home",
-  "funnelId": "69b065057b54ee5b8e155b7b"
+  "funnelId": "69b065057b54ee5b8e155b7b",
+  "locale": "DE"
 }
 </script>
 

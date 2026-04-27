@@ -1,14 +1,24 @@
 <!DOCTYPE html><html lang="en"><head><base href="/69b065057b54ee5b8e155b7b-preview/"><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="description" content=""><title>Akemi Detox Tea</title><link rel="icon" href="https://stdigitalmvmtprod001.blob.core.windows.net/assets/develop/adt-favicon-1%20(11).svg" type="image/svg+xml"><script>
 sessionStorage.setItem("test", false);
 
+const ALLOWED_AFFILIATE_IDS = [];
+
 let nextPageSlug = null;
 
 function handleUrlParams(params) {
   const specialParams = ["p_dc", "p_tenbucksoff", "p_freeship", "p_freegift"];
   const allowedDcValues = ["5", "10", "15", "20", "25"];
+  const currentAffId = params.get("affid") || sessionStorage.getItem("affid");
+  const discountsAllowed =
+    ALLOWED_AFFILIATE_IDS.length === 0 ||
+    (currentAffId !== null && ALLOWED_AFFILIATE_IDS.includes(currentAffId));
+  if (!discountsAllowed) {
+    specialParams.forEach((key) => sessionStorage.removeItem(key));
+  }
   params.forEach((value, key) => {
     const paramKey = `p_${key}`;
-    if (!sessionStorage.getItem(paramKey) && specialParams.includes(paramKey)) {
+    if (specialParams.includes(paramKey)) {
+      if (!discountsAllowed) return;
       if (paramKey === "p_dc" && !allowedDcValues.includes(value)) return;
       sessionStorage.setItem(paramKey, value);
     } else {
@@ -43,7 +53,6 @@ if (localStorage.getItem('sK_r')) {
       ? baseNext + '?' + urlParams.toString()
       : baseNext;
     nextPageSlug = withQuery && !withQuery.startsWith('/') ? '/69b065057b54ee5b8e155b7b-preview/' + withQuery : withQuery;
-    handleUrlParams(urlParams);
 
     document.addEventListener("DOMContentLoaded", () => {
       MVMT.init('69b065057b54ee5b8e155b7b', 'Presell')
@@ -68,7 +77,7 @@ if (localStorage.getItem('sK_r')) {
 const route = async () => {
   if (localStorage.getItem('sK_r')) return JSON.parse(localStorage.getItem('sK_r'));
   const sessionId = MVMT.getSessionId() || localStorage.getItem("mvmt_session_id") || "";
-  const url = 'https://func-ab-test-events-prod-001.azurewebsites.net/api/checkRoute?id=69b065057b54ee5b8e155b7b&v=177635339872316&sessionId='+sessionId;
+  const url = 'https://func-ab-test-events-prod-001.azurewebsites.net/api/checkRoute?id=69b065057b54ee5b8e155b7b&v=177730244719275&sessionId='+sessionId;
   try {
     const response = await fetch(url);
     if (!response.ok) throw new Error('Network response was not ok');
@@ -120,9 +129,7 @@ const nextPage = async () => {
   return absolute;
 }
 const urlParams = new URLSearchParams(window.location.search);
-urlParams.forEach((value, key) => {
-  sessionStorage.setItem(key, value);
-});
+handleUrlParams(urlParams);
 
 document.addEventListener("DOMContentLoaded", () => {
   document.addEventListener("click", (event) => {
@@ -1016,7 +1023,7 @@ main section {
         Therapy) degree. He’s spent his career helping patients recover from
         injuries, managing chronic conditions and improving their overall
         independence.
-      </p></div><footer id="section-footer" class="site-footer c-oaxxat cxpk1f6 c7l9c6s c-evftdq cb41wgj cl5gnj"><div id="j9Ipi0TAP9ytuUBnE8Tek" class="footer-content c-oaxxat cxpk1f6 c-evftdq c7l9c6s cb41wgj ckem8y5 c55lf7h ciqyju"><img src="assets/akemidetoxtea-logo-white.png" class="c-hi7sxz cjmgjye c-d7jzl0 cxvvo6e cv4ctcs" loading="lazy"/><nav id="HzdrFNzD_Off2tiQ1yYCA" class="footer-nav cey0ojg c-oaxxat cb31i7g c-evftdq c7l9c6s c-jff85s"><a id="oxE5v3NcAakA2EdJ3QSZF" class="cey0ojg c-msh9t cybjsex c-jp5aks ckrjqhp c5ak960" href="/2/terms" target="_self">AGB</a><span id="dhpTVsCPxhBA7J5b6bx2-" class=""> | </span><a id="oxE5v3NcAakA2EdJ3QSZF" class="cey0ojg c-msh9t cybjsex c-jp5aks c5ak960 ckrjqhp" href="/2/privacy" target="_self">Datenschutz</a><span id="dhpTVsCPxhBA7J5b6bx2-" class=""> | </span><a id="Eyl0KJtJcRuPsMGpCH5OO" class="cey0ojg c-msh9t cybjsex c-jp5aks c5ak960 ckrjqhp" href="/2/contact" target="_self">Kontakt</a></nav><div id="BpykfdUxLHNo8zi5aAf7X" class="footer-bottom"><p id="Eg0kDaPvT9eJaDhCXCNJm" class="copyright text cey0ojg c-msh9t cybkfeg c-jp5aks">© 2026 Akemi Detox Tea. Alle Rechte vorbehalten.</p></div><div id="72dYLp46iZ0Or8G1MXqYv" class="disclaimer text"><span id="GrY7AX6XEi0ptevLDBL6F" class="c-3n63zq"><span id="ffjym9W4-iGtCmtYCMHzp" class="c-cvr7xx cey0ojg c-mtr8v cybiifv c-jp5aks">Diese Vereinbarung kann aktualisiert werden, um Änderungen unserer Informationspraktiken zu berücksichtigen. Falls Änderungen vorgenommen werden, informieren wir dich per E-Mail und/oder durch eine Ankündigung auf unserer Website. Wir empfehlen dir, diese Seite regelmäßig zu prüfen, um die neuesten Informationen zu unseren Nutzungsbedingungen zu sehen. Wenn du mit den Änderungen nicht einverstanden bist, kannst du deine Registrierung bei USS kündigen, indem du USS sofort benachrichtigst. Du kannst sehen, wann diese Vereinbarung zuletzt aktualisiert wurde, indem du auf das „Zuletzt aktualisiert“-Datum oben in dieser Richtlinie schaust.</span><span id="U8eLUjMak9nmHuTS_m1IR" class="c-cvr7xx cey0ojg c-msh9t cybj5fe c-jp5aks"> </span></span></div></div></footer></div></div><script src="https://stdigitalmvmtprod001.blob.core.windows.net/libs/mvmt-latest.prod.js.min.js"></script><script src="scripts/index-v1-dtlv1-dtcv4.js"></script><script>document.addEventListener("DOMContentLoaded", () => {
+      </p></div><footer id="section-footer" class="site-footer c-oaxxat cxpk1f6 c7l9c6s c-evftdq cb41wgj cl5gnj c2u5rwt c-lyuxqq"><div id="j9Ipi0TAP9ytuUBnE8Tek" class="footer-content c-oaxxat cxpk1f6 c-evftdq c7l9c6s cb41wgj ckem8y5 c55lf7h ciqyju cm0mlst c4fe51k"><img src="assets/akemidetoxtea-logo-white.png" class="c-hi7sxz cjmgjye c-d7jzl0 cxvvo6e cv4ctcs" loading="lazy"/><nav id="HzdrFNzD_Off2tiQ1yYCA" class="footer-nav cey0ojg c-oaxxat cb31i7g c-evftdq c7l9c6s c-jff85s"><a id="oxE5v3NcAakA2EdJ3QSZF" class="cey0ojg c-msh9t cybjsex c-jp5aks ckrjqhp c5ak960" href="/2/terms" target="_self">AGB</a><span id="dhpTVsCPxhBA7J5b6bx2-" class=""> | </span><a id="oxE5v3NcAakA2EdJ3QSZF" class="cey0ojg c-msh9t cybjsex c-jp5aks c5ak960 ckrjqhp" href="/2/privacy" target="_self">Datenschutz</a><span id="dhpTVsCPxhBA7J5b6bx2-" class=""> | </span><a id="Eyl0KJtJcRuPsMGpCH5OO" class="cey0ojg c-msh9t cybjsex c-jp5aks c5ak960 ckrjqhp" href="/2/contact" target="_self">Kontakt</a></nav><div id="BpykfdUxLHNo8zi5aAf7X" class="footer-bottom"><p id="Eg0kDaPvT9eJaDhCXCNJm" class="copyright text cey0ojg c-msh9t cybkfeg c-jp5aks c-6s5fkd c1kzpo2">© 2026 Akemi Detox Tea. Alle Rechte vorbehalten.</p></div><div id="72dYLp46iZ0Or8G1MXqYv" class="disclaimer text c-6s5fkd c1kzpo2"><span id="GrY7AX6XEi0ptevLDBL6F" class="c-3n63zq"><span id="ffjym9W4-iGtCmtYCMHzp" class="c-cvr7xx cey0ojg c-mtr8v cybiifv c-jp5aks">Diese Vereinbarung kann aktualisiert werden, um Änderungen unserer Informationspraktiken zu berücksichtigen. Falls Änderungen vorgenommen werden, informieren wir dich per E-Mail und/oder durch eine Ankündigung auf unserer Website. Wir empfehlen dir, diese Seite regelmäßig zu prüfen, um die neuesten Informationen zu unseren Nutzungsbedingungen zu sehen. Wenn du mit den Änderungen nicht einverstanden bist, kannst du deine Registrierung bei USS kündigen, indem du USS sofort benachrichtigst. Du kannst sehen, wann diese Vereinbarung zuletzt aktualisiert wurde, indem du auf das „Zuletzt aktualisiert“-Datum oben in dieser Richtlinie schaust.</span><span id="U8eLUjMak9nmHuTS_m1IR" class="c-cvr7xx cey0ojg c-msh9t cybj5fe c-jp5aks"> </span></span></div></div></footer></div></div><script src="https://stdigitalmvmtprod001.blob.core.windows.net/libs/mvmt-latest.prod.js.min.js"></script><script src="scripts/index-v1-dtlv1-dtcv4.js"></script><script>document.addEventListener("DOMContentLoaded", () => {
     setTimeout(() => {
         const cookiesBannner = document.querySelector("[data-cookie-banner]");
         const buttons = document
@@ -1035,7 +1042,8 @@ main section {
 {
   "campaignId": "270",
   "pageType": "Presell",
-  "funnelId": "69b065057b54ee5b8e155b7b"
+  "funnelId": "69b065057b54ee5b8e155b7b",
+  "locale": "DE"
 }
 </script>
 

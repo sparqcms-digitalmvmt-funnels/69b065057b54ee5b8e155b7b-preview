@@ -151,7 +151,7 @@ const i18n = {
 
 // Validation patterns (RegExp – cannot be serialised as JSON)
 i18n.validationPatterns = {
-  zipCodeRegex: /^(?:\d{5}(?:-\d{4})?|[A-Za-z]\d[A-Za-z][ -]?\d[A-Za-z]\d|\d{4}|[A-Za-z]{1,2}\d[A-Za-z\d]?\s?\d[ABD-HJLN-UW-Z]{2})$/,
+  zipCodeRegex: /^(?:\d{5}(?:-\d{4})?|[A-Za-z]\d[A-Za-z](?:[ -]?\d[A-Za-z]\d)?|\d{4}|[A-Za-z]{1,2}\d[A-Za-z\d]?\s?\d[ABD-HJLN-UW-Z]{2})$/,
   nameRegex: /\b([A-ZÀ-ÿ][-,a-zÀ-ÿ. ']+[ ]*)+$/i,
 };
 
@@ -291,7 +291,7 @@ document.addEventListener("DOMContentLoaded", async () => {
 
   const endpoint =
     `orders?order_id=${orderids.join(",")}` +
-    `&with=order_offers,customer_address_billing,customer_address_shipping,customer,transactions,cart&pageId=a0CQfyWvTLilfG2uw1lzc1jPRpmTQF3ta3O4udH3fSa1kXH2nwcoOcR8U27N4H9j`
+    `&with=order_offers,customer_address_billing,customer_address_shipping,customer,transactions,cart&pageId=DJ0SUp9-OMxob5l1UTbC224E5mKOQJ4C5hPyXcfSDqWZz7S8Q5XyN-ElGTQ45tAj`
 
   const response = await fetch(
     `https://app-cms-api-proxy-prod-001.azurewebsites.net/vrio/${endpoint}`,

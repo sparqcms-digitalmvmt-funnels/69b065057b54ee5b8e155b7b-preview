@@ -73,12 +73,15 @@ function getNextPageSlugForRedirect() {
   return "/";
 }
 
-let isTest = JSON.parse(sessionStorage.getItem("test"));
+let isTest = sessionStorage.getItem("test");
 
-if (isTest === null && isTest !== false) {
+if (isTest === null) {
   isTest = false;
-  sessionStorage.setItem("test", isTest);
+  sessionStorage.setItem("test", String(isTest));
+} else {
+  isTest = isTest === "true";
 }
+
 const removeKlarnaParamsFromUrl = (urlValue) => {
   const sourceUrl = urlValue || window.location.href;
   const url = new URL(sourceUrl, window.location.origin);
@@ -249,7 +252,7 @@ const i18n = {
 
 // Validation patterns (RegExp – cannot be serialised as JSON)
 i18n.validationPatterns = {
-  zipCodeRegex: /^(?:\d{5}(?:-\d{4})?|[A-Za-z]\d[A-Za-z][ -]?\d[A-Za-z]\d|\d{4}|[A-Za-z]{1,2}\d[A-Za-z\d]?\s?\d[ABD-HJLN-UW-Z]{2})$/,
+  zipCodeRegex: /^(?:\d{5}(?:-\d{4})?|[A-Za-z]\d[A-Za-z](?:[ -]?\d[A-Za-z]\d)?|\d{4}|[A-Za-z]{1,2}\d[A-Za-z\d]?\s?\d[ABD-HJLN-UW-Z]{2})$/,
   nameRegex: /\b([A-ZÀ-ÿ][-,a-zÀ-ÿ. ']+[ ]*)+$/i,
 };
 
@@ -607,7 +610,7 @@ async function createOrderViaWallet(confirmationToken, paymentMethodId) {
         ?.getAttribute("data-shipping-profile-id") || undefined;
 
   const orderData = {
-    pageId: "J61wL0UFyLojd2-9I8csmgZmnquIsrofLK74r6eZhq95SQ5u-gvW5Avswjy9Za8M",
+    pageId: "S3AM-VccbScYlSAp-3GN7FHDf0CwL506wDWVEGYd2l2p13fq294EYJyVS_BZthyL",
     action: "process",
     campaign_id: CAMPAIGN_ID,
     connection_id: 1,
@@ -633,7 +636,8 @@ async function createOrderViaWallet(confirmationToken, paymentMethodId) {
       {
         offer_id: getVrioOfferIdByProductId(selectedProduct.id) ?? DEFAULT_OFFER_ID,
         order_offer_quantity: 1,
-        item_id: Number(selectedProduct.id)
+        item_id: Number(selectedProduct.id),
+        mainOffer: true
       }
     ],
     shipping_profile_id: shippingProfileId,
@@ -1394,7 +1398,7 @@ async function createOrderViaPaypal(isExpress = false) {
   const shippingProfileId = +document.querySelector(`[data-product-id="${selectedProduct.id}"]`)?.getAttribute('data-shipping-profile-id') || undefined;
   const sameAddress = isSameAddress();
   const orderData = {
-    pageId: "J61wL0UFyLojd2-9I8csmgZmnquIsrofLK74r6eZhq95SQ5u-gvW5Avswjy9Za8M",
+    pageId: "S3AM-VccbScYlSAp-3GN7FHDf0CwL506wDWVEGYd2l2p13fq294EYJyVS_BZthyL",
     action: "process",
     campaign_id: CAMPAIGN_ID,
     connection_id: 1, // VRIO URL ending /connection
@@ -1424,6 +1428,7 @@ async function createOrderViaPaypal(isExpress = false) {
         offer_id: getVrioOfferIdByProductId(selectedProduct.id) ?? DEFAULT_OFFER_ID,
         order_offer_quantity: 1,
         item_id: Number(selectedProduct.id),
+        mainOffer: true
       },
     ],
     shipping_profile_id: shippingProfileId,
@@ -1692,7 +1697,7 @@ async function createOrderViaKlarna() {
   const sameAddress = isSameAddress();
 
   const orderData = {
-    pageId: "J61wL0UFyLojd2-9I8csmgZmnquIsrofLK74r6eZhq95SQ5u-gvW5Avswjy9Za8M",
+    pageId: "S3AM-VccbScYlSAp-3GN7FHDf0CwL506wDWVEGYd2l2p13fq294EYJyVS_BZthyL",
     campaign_id: CAMPAIGN_ID,
     connection_id: 1,
     email: email,
@@ -1797,7 +1802,8 @@ async function createOrderViaKlarna() {
       offer_id:
         selectedProductOfferData?.offerId ?? DEFAULT_OFFER_ID,
       order_offer_quantity: 1,
-      item_id: Number(selectedProduct.id)
+      item_id: Number(selectedProduct.id),
+      mainOffer: true
     });
   }
 
@@ -2069,7 +2075,7 @@ async function createOrderViaCreditCard() {
   let orderTotal = Math.max(0, Number(selectedProduct.price) * selectedProduct.quantity);
 
   const orderData = {
-    pageId: "J61wL0UFyLojd2-9I8csmgZmnquIsrofLK74r6eZhq95SQ5u-gvW5Avswjy9Za8M",
+    pageId: "S3AM-VccbScYlSAp-3GN7FHDf0CwL506wDWVEGYd2l2p13fq294EYJyVS_BZthyL",
     action: "process",
     campaign_id: CAMPAIGN_ID,
     connection_id: 1, // VRIO URL ending /connection
@@ -2111,6 +2117,7 @@ async function createOrderViaCreditCard() {
         offer_id: getVrioOfferIdByProductId(selectedProduct.id) ?? DEFAULT_OFFER_ID,
         order_offer_quantity: 1,
         item_id: Number(selectedProduct.id),
+        mainOffer: true
       },
     ],
     shipping_profile_id: shippingProfileId,
@@ -3442,6 +3449,7 @@ if (typeof validateAndSendToKlaviyo === "function") {
         selector: "[name='billingZip']",
         rules: [
           { rule: "required", errorMessage: i18n.validation.billingZipRequired },
+          { rule: "customRegexp", value: i18n.validationPatterns.zipCodeRegex, errorMessage: i18n.validation.zipInvalid },
         ],
       },
     ];
@@ -3983,7 +3991,7 @@ async function returnPaypal() {
 ;
 
     const body = {
-        pageId: "J61wL0UFyLojd2-9I8csmgZmnquIsrofLK74r6eZhq95SQ5u-gvW5Avswjy9Za8M",
+        pageId: "S3AM-VccbScYlSAp-3GN7FHDf0CwL506wDWVEGYd2l2p13fq294EYJyVS_BZthyL",
         action: "process",
         campaign_id: CAMPAIGN_ID,
         connection_id: 1,
@@ -4406,7 +4414,7 @@ function handleFreeGiftParam(allProducts) {
     }
 
     let currentProduct;
-    const productsElements = document.querySelectorAll('[data-products] [data-product-id]');
+    const productsElements = document.querySelectorAll('[data-products] [data-product-id]:not([data-bundled-upsell])');
     const activeProduct = document.querySelector('[data-products] .product-card-active');
     if (activeProduct && prices) {
       const foundProduct = prices.find(
@@ -4429,7 +4437,6 @@ function handleFreeGiftParam(allProducts) {
     const discountFromUrlParam = parseInt(sessionStorage.getItem('p_dc'));
     const hasTenBucksOff = sessionStorage.getItem('p_tenbucksoff') === 'yes';
     if (discountFromUrlParam || hasTenBucksOff) {
-      applyDiscount(10);
       applyDiscount(discountFromUrlParam, hasTenBucksOff);
     }
 
@@ -4472,12 +4479,14 @@ function handleFreeGiftParam(allProducts) {
         }
       });
 
-      if (isTenBucksDiscount) {
-        currentProduct.price =
-          (currentProduct.price * currentProduct.quantity - 10) / currentProduct.quantity;
-      } else {
-        currentProduct.price =
-          currentProduct.price - (currentProduct.price * discountPercent) / 100;
+      if (currentProduct) {
+        if (isTenBucksDiscount) {
+          currentProduct.price =
+            (currentProduct.price * currentProduct.quantity - 10) / currentProduct.quantity;
+        } else {
+          currentProduct.price =
+            currentProduct.price - (currentProduct.price * discountPercent) / 100;
+        }
       }
 
       const discountContainers = document.querySelectorAll(
@@ -4532,13 +4541,12 @@ function handleFreeGiftParam(allProducts) {
       const currentUnitPrice = Number(currentProduct?.price || 0);
 
       if (currentProduct) {
-        const fullPriceElement = Number(
-          document
-            .querySelector(
-              `[data-product-card][data-product-id='${currentProduct.id}'] [data_product_full_price]`,
-            )
-            .innerHTML.replaceAll(",", ".").replaceAll(/[^0-9.]+/g, ''),
+        const fullPriceNode = document.querySelector(
+          `[data-product-card][data-product-id='${currentProduct.id}'] [data_product_full_price]`,
         );
+        const fullPriceElement = fullPriceNode
+          ? parseFloat(fullPriceNode.innerHTML.replaceAll(",", ".").replace(/[^0-9.,]+/g, '')) || 0
+          : currentUnitPrice;
         hasItems = true;
         if (shouldSkipRecurring && isRecurringByProductId(currentProduct.id)) {
           // Skip recurring main product for Klarna
@@ -4642,8 +4650,9 @@ function handleFreeGiftParam(allProducts) {
         if (shouldSkipRecurring && isRecurringByProductId(productObject.id)) {
           return;
         }
-        hasItems = true;
         const product = prices.find((p) => p.id === Number(productObject.id));
+        if (!product) return;
+        hasItems = true;
         const productElement = getProductElement(productObject.id);
         const customName =
           productElement.dataset.customProductName ||
