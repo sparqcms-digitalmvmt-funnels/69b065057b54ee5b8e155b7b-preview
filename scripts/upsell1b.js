@@ -1,7 +1,7 @@
 
 
 
-
+const EMAIL_OVERSIGHT_VALIDATE_URL = 'https://app-cms-api-proxy-prod-001.azurewebsites.net/integration/email-oversight/validate-public';
 
 let isTest = sessionStorage.getItem("test");
 if (isTest === null && isTest !== false) {
@@ -59,6 +59,32 @@ const getVrioCampaignInfoBasedOnPaymentMethod = (isVipUpsell) => {
 ;
 const isVipUpsell = false;
 const { vrioCampaignId, countries, integrationId } = getVrioCampaignInfoBasedOnPaymentMethod(isVipUpsell);
+const CURRENCY = "EUR";
+
+const CURRENCY_LOCALE_MAP = {
+  USD: 'en-US',
+  EUR: 'de-DE',
+  GBP: 'en-GB',
+  AUD: 'en-AU',
+};
+const LOCALE = getLocaleFromCurrency(CURRENCY);
+
+function getLocaleFromCurrency(currencyCode) {
+  const code = (currencyCode || '').toUpperCase();
+  if (code && CURRENCY_LOCALE_MAP[code]) return CURRENCY_LOCALE_MAP[code];
+  return navigator.language || 'en-US';
+};
+
+function formatPrice(amount, suffix = '') {
+  const formatted = new Intl.NumberFormat(LOCALE, {
+    style: 'currency',
+    currency: CURRENCY.toUpperCase(),
+    minimumFractionDigits: 2,
+    maximumFractionDigits: 2,
+  }).format(amount);
+  return `${formatted}${suffix}`;
+};
+
 
 const i18n = {
   "iso2": "DE",
@@ -130,7 +156,16 @@ const i18n = {
   "labels": {
     "noStatesAvailable": "Keine Bundesländer für dieses Land verfügbar",
     "selectState": "Bundesland auswählen",
-    "phoneSearchPlaceholder": "Suchen"
+    "phoneSearchPlaceholder": "Suchen",
+    "processing": "Wird verarbeitet...",
+    "close": "Schließen",
+    "cvvModalTitle": "Wo befindet sich mein Sicherheitscode?",
+    "cvvCardBack": "Rückseite der Karte",
+    "cvvCardFront": "Vorderseite der Karte",
+    "cvvThreeDigitLabel": "3-stellige CVV-Nummer",
+    "cvvFourDigitLabel": "4-stellige CVV-Nummer",
+    "cvvBackDescription": "Der 3-stellige Sicherheitscode (CVV) befindet sich auf der Rückseite Ihrer Karte, rechts neben dem Unterschriftsstreifen.",
+    "cvvFrontDescription": "American-Express-Karten haben einen 4-stelligen Code auf der Vorderseite."
   }
 };
 
@@ -158,7 +193,7 @@ const UPSELL_NEXT_PAGE_SLUG = "2/order/de/eu/thank-you";
 function getNextPageSlugForRedirect() {
   const normalize = (value) => {
     if (!value) return "";
-    return value.startsWith("/") ? value : "/" + value;
+    return value.startsWith("/69b065057b54ee5b8e155b7b-preview") ? value : (value.startsWith("/") ? "/69b065057b54ee5b8e155b7b-preview" + value : "/69b065057b54ee5b8e155b7b-preview/" + value);
   };
   if (UPSELL_NEXT_PAGE_SLUG) return normalize(UPSELL_NEXT_PAGE_SLUG);
   return "/";
@@ -308,6 +343,7 @@ const createCart = async (sanitizedOrderData) => {
         offers: sanitizedOrderData.offers,
         campaign_id: CAMPAIGN_ID,
         connection_id: sanitizedOrderData.connection_id,
+        pageId: sanitizedOrderData.pageId,
       }),
       keepalive: false,
     }
@@ -683,7 +719,20 @@ async function returnKlarna() {
       } catch (error) {
         console.error("Error sending transaction to data layer", error);
       }
-      window.location.href = "/" + nextPageSlug;
+      try {
+        if (typeof sendKlaviyoOrderEvents === 'function') {
+          await sendKlaviyoOrderEvents(orderData, result, true);
+        }
+      } catch (error) {
+        console.error("Error sending order events to Klaviyo", error);
+      }
+      const redirectSlug =
+        typeof nextPageSlug === "string" && nextPageSlug.length > 0
+          ? nextPageSlug.startsWith("/")
+            ? nextPageSlug
+            : "/" + nextPageSlug
+          : "/";
+      window.location.href = redirectSlug;
     } else {
       if (!isLive) await flagOrderAsTest(resultOrderId);
 
@@ -891,7 +940,7 @@ const processKlarnaUpsell = async () => {
         body: JSON.stringify({
           offers: offers.map((o) => JSON.stringify(o)),
           order_id: lastOrderId,
-          pageId: "u6-vS3aW8R8m7dYNJynMd6QSeTeFNOiQtnkwo7Ws4IRdr9wwECNU8nWwsmUmADYL"
+          pageId: "Keg1EiYgnMHeySwVD7uZ8MWyy02vlyzK6tc1WsZRmtbHXCWHj0-H-SvND0x6W6rz"
         })
       }
     );
@@ -971,7 +1020,7 @@ const processUpsell = async () => {
   }
   try {
     const orderData = JSON.parse(sessionStorage.getItem("orderData"));
-    orderData.pageId = "u6-vS3aW8R8m7dYNJynMd6QSeTeFNOiQtnkwo7Ws4IRdr9wwECNU8nWwsmUmADYL";
+    orderData.pageId = "Keg1EiYgnMHeySwVD7uZ8MWyy02vlyzK6tc1WsZRmtbHXCWHj0-H-SvND0x6W6rz";
     const lastOrderId = sessionStorage.getItem("cms_oid");
     const stripePayment = JSON.parse(sessionStorage.getItem("stripePayment"));
     const isStripeTestOrder = stripePayment && !stripePayment.isLive;
@@ -1146,6 +1195,14 @@ const processUpsell = async () => {
     
     sendTransactionToDataLayer(vrioToTransaction(result), paymentMethodName);
 
+    try {
+      if (typeof sendKlaviyoOrderEvents === 'function') {
+        await sendKlaviyoOrderEvents(sanitizedOrderData, result);
+      }
+    } catch (error) {
+      console.error("Error sending order events to Klaviyo", error);
+    }
+
     window.location.href = getNextPageSlugForRedirect();
   } catch (error) {
     console.error(error);
@@ -1166,7 +1223,60 @@ const areAllProductsRecurring = () => {
   return pageProductIds.length > 0 && pageProductIds.every((productId) => isRecurringProduct(productId));
 }
 
+
+
 document.addEventListener("DOMContentLoaded", async () => {
+  
+(function ensurePreloaderExists() {
+    if (document.querySelector('[data-preloader]')) return;
+    const loaderOverlay = document.createElement('div');
+    loaderOverlay.setAttribute('data-preloader', '');
+    loaderOverlay.innerHTML = `
+        <div class="loader"></div>
+        <p>${i18n.labels.processing}</p>
+    `;
+
+    const loaderStyles = `
+        [data-preloader] {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            flex-direction: column;
+            gap: 8px;
+            background: rgba(255, 255, 255, 0.3);
+            z-index: 9999;
+        }
+        [data-preloader] .loader {
+            width: 48px;
+            height: 48px;
+            border-bottom-color: transparent !important;
+            border-radius: 50%;
+            display: inline-block;
+            box-sizing: border-box;
+            animation: rotation 1s linear infinite;
+            margin-top: 22px;
+            border: 5px solid rgb(18, 76, 117);
+        }
+
+        @keyframes rotation {
+            0% {
+                transform: rotate(0deg);
+            }
+
+            100% {
+                transform: rotate(360deg);
+            }
+        }
+    `;
+    document.head.insertAdjacentHTML('beforeend', `<style>${loaderStyles}</style>`);
+    document.body.appendChild(loaderOverlay);
+})();
+
   
 if (typeof validateAndSendToKlaviyo === "function") {
   try {

@@ -1,6 +1,13 @@
 
-  
-// Select campaign based on whether this is a VIP page or not  
+
+
+const EMAIL_OVERSIGHT_VALIDATE_URL = 'https://app-cms-api-proxy-prod-001.azurewebsites.net/integration/email-oversight/validate-public';
+
+
+
+
+
+// Select campaign based on whether this is a VIP page or not
 const getVrioCampaignInfoBasedOnPaymentMethod = (isVipUpsell) => {
     const vrioCampaigns = [{"_id":"69b052fc7b54ee5b8e1554d3","integration":[{"_id":"68de8b4ba7998abc5f77b02a","workspace":"develop","platform":"vrio","description":"production","fields":{"publicApiKey":"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzY29wZSI6ImFkbWluIiwib3JnYW5pemF0aW9uIjoibXZtdC52cmlvIiwiaWQiOiJhZTE4OGY0ZC0yMDAwLTQ4ZWItOGE4YS03OGY1ZjBiMWQxZGMiLCJpYXQiOjE3NTU3MjQ1OTIsImF1ZCI6InVybjp2cmlvOmFwaTp1c2VyIiwiaXNzIjoidXJuOnZyaW86YXBpOmF1dGhlbnRpY2F0b3IiLCJzdWIiOiJ1cm46dnJpbzphcGk6MjIifQ.51xFtExTqVm3o2mhizx3VsiSTv7pNAB6beF1rmV_-Jg","internalApiKey":"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzY29wZSI6ImFkbWluIiwib3JnYW5pemF0aW9uIjoibXZtdC52cmlvIiwiaWQiOiJhZTE4OGY0ZC0yMDAwLTQ4ZWItOGE4YS03OGY1ZjBiMWQxZGMiLCJpYXQiOjE3NTU3MjQ1OTIsImF1ZCI6InVybjp2cmlvOmFwaTp1c2VyIiwiaXNzIjoidXJuOnZyaW86YXBpOmF1dGhlbnRpY2F0b3IiLCJzdWIiOiJ1cm46dnJpbzphcGk6MjIifQ.51xFtExTqVm3o2mhizx3VsiSTv7pNAB6beF1rmV_-Jg"},"status":"active","createdAt":1758437407128,"updatedAt":1759415115447,"__v":0,"category":"CRM","id":"68de8b4ba7998abc5f77b02a"}],"externalId":"270","name":"Akemi Detox Tea - Network - (1) - Germany","currency":"EUR","countries":[81],"metadata":{"campaign_id":270,"campaign_name":"","payment_type_id":1,"campaign_active":true,"campaign_prepaid":true,"campaign_payment_method_required":true,"campaign_group_transactions":true,"campaign_global_js":"","campaign_global_seo_title":"","campaign_global_seo_keywords":"","campaign_global_seo_description":"","date_created":"2026-04-01 19:35:24","created_by":0,"date_modified":"2026-04-01 19:35:24","modified_by":0,"campaign_notes":"","offers":[],"shipping_profiles":[],"campaignId":"270","externalId":270,"description":"","payment_methods":["amex","discover","visa","master"],"alternative_payments":[],"countries":[{"iso_numeric":276,"calling_code":"49","id":81,"name":"Germany","iso_2":"DE","iso_3":"DEU"}]},"funnels":[],"createdAt":1773073684924,"updatedAt":1775072124986,"packages":[],"status":"active","platform":"vrio","__v":1,"id":"69b052fc7b54ee5b8e1554d3"}];
 
@@ -145,7 +152,16 @@ const i18n = {
   "labels": {
     "noStatesAvailable": "Keine Bundesländer für dieses Land verfügbar",
     "selectState": "Bundesland auswählen",
-    "phoneSearchPlaceholder": "Suchen"
+    "phoneSearchPlaceholder": "Suchen",
+    "processing": "Wird verarbeitet...",
+    "close": "Schließen",
+    "cvvModalTitle": "Wo befindet sich mein Sicherheitscode?",
+    "cvvCardBack": "Rückseite der Karte",
+    "cvvCardFront": "Vorderseite der Karte",
+    "cvvThreeDigitLabel": "3-stellige CVV-Nummer",
+    "cvvFourDigitLabel": "4-stellige CVV-Nummer",
+    "cvvBackDescription": "Der 3-stellige Sicherheitscode (CVV) befindet sich auf der Rückseite Ihrer Karte, rechts neben dem Unterschriftsstreifen.",
+    "cvvFrontDescription": "American-Express-Karten haben einen 4-stelligen Code auf der Vorderseite."
   }
 };
 
@@ -169,7 +185,7 @@ const THANK_YOU_NEXT_PAGE_SLUG = "";
 function getNextPageSlugForRedirect() {
   const normalize = (value) => {
     if (!value) return "";
-    return value.startsWith("/") ? value : "/" + value;
+    return value.startsWith("/69b065057b54ee5b8e155b7b-preview") ? value : (value.startsWith("/") ? "/69b065057b54ee5b8e155b7b-preview" + value : "/69b065057b54ee5b8e155b7b-preview/" + value);
   };
   if (THANK_YOU_NEXT_PAGE_SLUG) return normalize(THANK_YOU_NEXT_PAGE_SLUG);
   return "/";
@@ -291,7 +307,7 @@ document.addEventListener("DOMContentLoaded", async () => {
 
   const endpoint =
     `orders?order_id=${orderids.join(",")}` +
-    `&with=order_offers,customer_address_billing,customer_address_shipping,customer,transactions,cart&pageId=DJ0SUp9-OMxob5l1UTbC224E5mKOQJ4C5hPyXcfSDqWZz7S8Q5XyN-ElGTQ45tAj`
+    `&with=order_offers,customer_address_billing,customer_address_shipping,customer,transactions,cart&pageId=FVu0rEEsLAr-69ngHS41T_r8H9tXTU3Us_ysEkrT-qkO2ea2GxSGllAQoe91ixq3`
 
   const response = await fetch(
     `https://app-cms-api-proxy-prod-001.azurewebsites.net/vrio/${endpoint}`,

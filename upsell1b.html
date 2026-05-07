@@ -77,7 +77,7 @@ if (localStorage.getItem('sK_r')) {
 const route = async () => {
   if (localStorage.getItem('sK_r')) return JSON.parse(localStorage.getItem('sK_r'));
   const sessionId = MVMT.getSessionId() || localStorage.getItem("mvmt_session_id") || "";
-  const url = 'https://func-ab-test-events-prod-001.azurewebsites.net/api/checkRoute?id=69b065057b54ee5b8e155b7b&v=177730244719275&sessionId='+sessionId;
+  const url = 'https://func-ab-test-events-prod-001.azurewebsites.net/api/checkRoute?id=69b065057b54ee5b8e155b7b&v=177811202972545&sessionId='+sessionId;
   try {
     const response = await fetch(url);
     if (!response.ok) throw new Error('Network response was not ok');
@@ -227,11 +227,11 @@ document.addEventListener("DOMContentLoaded", async() => {
   
   </script>
 <script>
-  const offerName = ', Akemi Detox Tea';
+  const offerName = 'Akemi Detox Tea';
   window.dataLayer = window.dataLayer || [];
   window.dataLayer.push({
     'event': 'pageView', 
-    'offer': ', Akemi Detox Tea',
+    'offer': 'Akemi Detox Tea',
     'customer_id':sessionStorage.getItem("customerId") || undefined,
     'page':{
       'type':'Upsell',
@@ -4351,7 +4351,34 @@ if(x.isFunction(n))while(r=o[i++])"+"===r[0]?(r=r.slice(1)||"*",(e[r]=e[r]||[]).
         return _;
     };
 
-}));</script>
+}));</script><script>var s = document.createElement('script');
+s.src = 'https://www.mxj5trk.com/scripts/main.js';
+s.onload = function() {
+  (function orderTakenFireEverflowConversion() {
+    if (!sessionStorage.getItem("cms_oid")) return;
+    const urlParamsEF = new URLSearchParams(window.location.search);
+    const rawAffId = urlParamsEF.get('AFFID') || urlParamsEF.get('affid') || sessionStorage.getItem("AFFID") || sessionStorage.getItem("affid");
+    const affiliateId = parseInt(rawAffId, 10) || 1095;
+    if (typeof EF !== 'undefined') {
+      EF.conversion({
+        offer_id: 1768,
+        affiliate_id: affiliateId,
+        amount: 0
+      })
+      .then(res => {
+        console.log('[Everflow] SUCCESS', res);
+      })
+      .catch(err => {
+        console.error('[Everflow] ERROR', err);
+      });
+    
+      console.log('[Everflow] Clickless conversion triggered');
+    } else {
+      console.error('[Everflow] SDK not loaded');
+    }
+  })();
+};
+document.head.appendChild(s);</script>
 <script type="application/json" id="page-config">
 {
   "campaignId": "270",
